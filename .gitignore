@@ -7,3 +7,8 @@ Thumbs.db
 /releases/
 /nw/
 /tmp/
+*.sw[po]
+xfers
+config.json
+*.pem
+npm-debug.log

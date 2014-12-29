@@ -1,0 +1,13 @@
+{
+  "name": "EliteCommBeaconServer",
+  "version": "0.0.1",
+  "description": "Real time web chat for Elite: Dangerous",
+  "dependencies": {
+    "express": "^4.10.6",
+    "nedb": "^1.0.1",
+    "pubsub-js": "^1.5.0",
+    "socket.io": "^1.2.1",
+    "winston": "^0.8.3"
+  },
+  "author": "Les Orchard <me@lmorchard.com>"
+}
