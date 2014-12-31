@@ -1,6 +1,6 @@
 {
     "name": "elite-local-chat",
-    "prettyName": "Elite Local Chat",
+    "prettyName": "Elite Comm Beacon",
     "description": "Prototype of a chat channel that follows star system changes in Elite: Dangerous",
     "version": "0.1.0",
     "author": "Les Orchard <me@lmorchard.com>",

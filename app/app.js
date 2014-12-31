@@ -12,6 +12,19 @@ var SERVER_URL = 'http://localhost:31173';
 var LOGS_PATH = getUserHome() + "/AppData/Local/Frontier_Developments/" +
   "Products/FORC-FDEV-D-1010/Logs";
 
+var currSystem, currName;
+
+// Get name of the app from package.json and set it as title.
+document.title = gui.App.manifest.prettyName;
+
+// Create default menu items for OSX
+if (process.platform === 'darwin') {
+  var mb = new gui.Menu({ type: "menubar" });
+  mb.createMacBuiltin(gui.App.manifest.prettyName);
+  gui.Window.get().menu = mb;
+}
+
+// Load up the chat frame
 var chatFrame = document.querySelector('iframe[name=chat]');
 chatFrame.setAttribute('src', SERVER_URL);
 
@@ -21,7 +34,12 @@ setInterval(scanLogs, 3000);
 // Accept commands from chat frame
 window.addEventListener('message', function (ev) {
   var msg = JSON.parse(ev.data);
-  if ('scanLogs' == msg.op) { scanLogs(); }
+  if ('scanLogs' == msg.op) {
+    // Clear the current system & name, since the server is asking for a fresh
+    // scan on connect.
+    currSystem = currName = null;
+    scanLogs();
+  }
 }, false);
 
 function scanLogs () {
@@ -46,8 +64,6 @@ function scanLogs () {
 var RE_SYSTEM = /System:(\d+)\(([^\)]+)\) /;
 var RE_NAME = /FindBestIsland:([^:]+):/;
 
-var currSystem, currName;
-
 function scrapeNetLog (latest) {
   // Read the netLog file
   fs.readFile(latest, function (err, data) {
@@ -57,20 +73,20 @@ function scrapeNetLog (latest) {
     var lines = data.toString().split("\n");
     lines.reverse();
 
-    // Find the most recent FindBestIsland: line, extract CMDR name
+    // Find the most recent FindBestIsland: and System: lines, extract info
     var name = RE_NAME.exec(firstMatch(lines, 'FindBestIsland:'))[1];
-    if (name != currName) {
-      currName = name;
-      chat_postMessage({op: 'updateName', name: name});
-    }
-
-    // Find the most recent System: line, extract system name
     var system = RE_SYSTEM.exec(firstMatch(lines, 'System:'))[2];
-    if (system != currSystem) {
+    if (name != currName || system != currSystem) {
+      currName = name;
       currSystem = system;
-      chat_postMessage({op: 'updateSystem', system: system});
+      chat_postMessage({
+        op: 'updateMeta',
+        name: name,
+        system: system
+      });
+      document.title = gui.App.manifest.prettyName + ' | ' +
+        'CMDR ' + name + ' | ' + system;
     }
-
   });
 }
 
